@@ -165,3 +165,20 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(container.clientWidth, container.clientHeight);
 });
+
+// 6. Color Picker Logic
+const colorPicker = document.getElementById('filamentColor');
+
+colorPicker.addEventListener('input', (e) => {
+    const hexColor = e.target.value;
+    
+    // 1. Update the default material so any NEW parts the user selects load in this color
+    defaultMaterial.color.set(hexColor);
+    
+    // 2. Loop through the currently loaded parts on the screen and update their color immediately
+    for (const category in currentParts) {
+        if (currentParts[category]) {
+            currentParts[category].material.color.set(hexColor);
+        }
+    }
+});
