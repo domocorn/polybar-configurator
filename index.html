@@ -1,1 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Polybar Configurator</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
+    <div id="sidebar">
+        <h2>Polybar Builder</h2>
+        
+        <div class="control-group">
+            <label for="bodySelect">Select Body:</label>
+            <select id="bodySelect">
+                <option value="main_chassis.stl">Standard Chassis</option>
+                <option value="split_chassis.stl">Split Chassis</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="neckSelect">Select Neck:</label>
+            <select id="neckSelect">
+                <option value="short_neck.stl">Short Neck</option>
+                <option value="long_neck.stl">Long Neck</option>
+            </select>
+        </div>
+
+        <button id="exportBtn">Download Print Files (.zip)</button>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script src="js/three.min.js"></script>
+    <script src="js/STLLoader.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/jszip.min.js"></script>
+    <script src="js/FileSaver.js"></script>
+    
+    <script src="js/app.js"></script>
+
+</body>
+</html>
