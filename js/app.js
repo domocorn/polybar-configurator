@@ -50,6 +50,44 @@ function loadPart(category, filename) {
     });
 }
 
+// Function to populate the dropdowns from the JSON catalog
+async function loadCatalog() {
+    try {
+        const response = await fetch('catalog.json');
+        const catalog = await response.json();
+
+        const bodySelect = document.getElementById('bodySelect');
+        const neckSelect = document.getElementById('neckSelect');
+
+        // Populate Bodies
+        catalog.bodies.forEach(filename => {
+            const option = document.createElement('option');
+            option.value = filename;
+            // Cleans up the name for the UI (e.g., "main_chassis.stl" -> "Main Chassis")
+            option.textContent = filename.replace('.stl', '').replace('_', ' ').toUpperCase();
+            bodySelect.appendChild(option);
+        });
+
+        // Populate Necks
+        catalog.necks.forEach(filename => {
+            const option = document.createElement('option');
+            option.value = filename;
+            option.textContent = filename.replace('.stl', '').replace('_', ' ').toUpperCase();
+            neckSelect.appendChild(option);
+        });
+
+        // Now that the menus are populated, load the first parts into the 3D viewer
+        if(catalog.bodies.length > 0) loadPart('body', bodySelect.value);
+        if(catalog.necks.length > 0) loadPart('neck', neckSelect.value);
+
+    } catch (error) {
+        console.error("Failed to load catalog.json", error);
+    }
+}
+
+// Fire the function to start the process
+loadCatalog();
+
 // 3. UI Event Listeners
 const bodySelect = document.getElementById('bodySelect');
 const neckSelect = document.getElementById('neckSelect');
