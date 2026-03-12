@@ -20,23 +20,20 @@ scene.add(dirLight);
 const loader = new THREE.STLLoader();
 const defaultMaterial = new THREE.MeshStandardMaterial({ color: 0x909090, roughness: 0.4, metalness: 0.1 });
 
-// We keep track of what is currently loaded so we can remove it before adding a new part
-let currentParts = {
-    body: null,
-    neck: null
-};
+// Store loaded parts dynamically based on their category
+let currentParts = {}; 
 
-function loadPart(category, filename) {
-    // This dynamically builds the URL using the exact folder and file path
-    const path = `models/${category}/${filename}`;
+function loadPart(category, filepath) {
+    // Construct the full path using the category folder and the nested filepath
+    const path = `models/${category}/${filepath}`;
     
     loader.load(path, function (geometry) {
-        // Remove the old part if it exists
+        // Remove the old part for this specific category if it exists
         if (currentParts[category]) {
             scene.remove(currentParts[category]);
         }
 
-        geometry.center(); // Center the geometry for preview
+        geometry.center(); 
         const mesh = new THREE.Mesh(geometry, defaultMaterial);
         
         // Fix STL rotation
@@ -47,58 +44,68 @@ function loadPart(category, filename) {
         scene.add(mesh);
         
     }, undefined, function (error) {
-        console.error(`Error loading ${filename}:`, error);
+        console.error(`Error loading ${filepath}:`, error);
     });
 }
 
-// Function to populate the dropdowns from the JSON catalog
+// 3. Dynamic UI Generation
 async function loadCatalog() {
     try {
-        const response = await fetch('catalog.json');
+        // We append a timestamp to the fetch URL so the browser doesn't cache an old JSON file during testing
+        const response = await fetch('catalog.json?' + new Date().getTime());
         const catalog = await response.json();
-
-        const bodySelect = document.getElementById('bodySelect');
-        const neckSelect = document.getElementById('neckSelect');
-
-        // Populate Bodies
-        catalog.bodies.forEach(filename => {
-            const option = document.createElement('option');
-            option.value = filename;
-            // Cleans up the name for the UI (e.g., "main_chassis.stl" -> "Main Chassis")
-            option.textContent = filename.replace('.stl', '').replace('_', ' ').toUpperCase();
-            bodySelect.appendChild(option);
-        });
-
-        // Populate Necks
-        catalog.necks.forEach(filename => {
-            const option = document.createElement('option');
-            option.value = filename;
-            option.textContent = filename.replace('.stl', '').replace('_', ' ').toUpperCase();
-            neckSelect.appendChild(option);
-        });
-
-        // Now that the menus are populated, load the first parts into the 3D viewer
-        if(catalog.bodies.length > 0) loadPart('body', bodySelect.value);
-        if(catalog.necks.length > 0) loadPart('neck', neckSelect.value);
+        
+        const menuContainer = document.getElementById('dynamic-menus');
+        
+        // Loop through every category found in the JSON (e.g., "Frames")
+        for (const category in catalog) {
+            const files = catalog[category];
+            if (files.length === 0) continue; // Skip empty folders
+            
+            // Create the wrapper div
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'control-group';
+            
+            // Create the label
+            const label = document.createElement('label');
+            label.textContent = `Select ${category}:`;
+            groupDiv.appendChild(label);
+            
+            // Create the dropdown menu
+            const select = document.createElement('select');
+            select.dataset.category = category; // We store the category name here for the export function
+            
+            // Populate the dropdown with options
+            files.forEach(filepath => {
+                const option = document.createElement('option');
+                option.value = filepath; // Keep the full nested path as the underlying value
+                
+                // Clean up the text for the UI (extracts just the filename and removes '.stl')
+                const filenameOnly = filepath.split('/').pop().replace('.stl', '');
+                option.textContent = filenameOnly;
+                
+                select.appendChild(option);
+            });
+            
+            // When the user changes this dropdown, load the new part
+            select.addEventListener('change', (e) => {
+                loadPart(category, e.target.value);
+            });
+            
+            groupDiv.appendChild(select);
+            menuContainer.appendChild(groupDiv);
+            
+            // Automatically load the very first item in the list into the 3D viewer
+            loadPart(category, select.value);
+        }
 
     } catch (error) {
         console.error("Failed to load catalog.json", error);
     }
 }
 
-// Fire the function to start the process
+// Start the UI build process
 loadCatalog();
-
-// 3. UI Event Listeners
-const bodySelect = document.getElementById('bodySelect');
-const neckSelect = document.getElementById('neckSelect');
-
-bodySelect.addEventListener('change', (e) => loadPart('body', e.target.value));
-neckSelect.addEventListener('change', (e) => loadPart('neck', e.target.value));
-
-// Load initial default parts on startup
-loadPart('body', bodySelect.value);
-loadPart('neck', neckSelect.value);
 
 // 4. ZIP Export Logic
 document.getElementById('exportBtn').addEventListener('click', async () => {
@@ -109,25 +116,35 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
     try {
         const zip = new JSZip();
         
-        // Get current selections
-        const selectedBody = bodySelect.value;
-        const selectedNeck = neckSelect.value;
+        // Find every dynamically generated dropdown menu on the page
+        const selects = document.querySelectorAll('#dynamic-menus select');
+        
+        // Loop through them to fetch the actively selected files
+        for (let i = 0; i < selects.length; i++) {
+            const select = selects[i];
+            const category = select.dataset.category;
+            const filepath = select.value;
+            
+            // Extract just the filename so the final ZIP is a clean, flat list of files
+            const filenameOnly = filepath.split('/').pop(); 
+            
+            // Fetch the raw STL data from the server
+            const blob = await fetch(`models/${category}/${filepath}`).then(res => {
+                if(!res.ok) throw new Error(`Could not fetch ${filepath}`);
+                return res.blob();
+            });
 
-        // Fetch the raw STL data from the server/folder
-        const bodyBlob = await fetch(`models/bodies/${selectedBody}`).then(res => res.blob());
-        const neckBlob = await fetch(`models/necks/${selectedNeck}`).then(res => res.blob());
+            // Add the file into the ZIP archive (e.g., "Frames_Wizard Plate - Back Left (Max).stl")
+            zip.file(`${category}_${filenameOnly}`, blob);
+        }
 
-        // Add them to the ZIP archive
-        zip.file(`Polybar_Body_${selectedBody}`, bodyBlob);
-        zip.file(`Polybar_Neck_${selectedNeck}`, neckBlob);
-
-        // Generate the ZIP and download
+        // Generate the ZIP and trigger the download
         const content = await zip.generateAsync({ type: "blob" });
         saveAs(content, "Custom_Polybar_Build.zip");
 
     } catch (error) {
         console.error("Export failed:", error);
-        alert("Failed to package files. Are you running this on a local server?");
+        alert("Failed to package files. Are you running this via local server or GitHub?");
     }
 
     // Reset button
