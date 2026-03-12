@@ -1,3 +1,29 @@
 {
-    "Frames": []
+    "Frames": [
+        "Wizard Frame/Accessory Parts/Strap Lug.stl",
+        "Wizard Frame/Accessory Parts/Whammy Chassis.stl",
+        "Wizard Frame/Accessory Parts/Whammy Magnet Paddle.stl",
+        "Wizard Frame/Accessory Parts/Whammy Spring.stl",
+        "Wizard Frame/Wizard Headstock/Fret Cap - Headstock.stl",
+        "Wizard Frame/Wizard Headstock/Headstock Dowel.stl",
+        "Wizard Frame/Wizard Headstock/Headstock Tuner.stl",
+        "Wizard Frame/Wizard Headstock/Wizard Headstock Base.stl",
+        "Wizard Frame/Wizard Headstock/Wizard Headstock Faceplate.stl",
+        "Wizard Frame/Wizard Parts Frame (Max)/Wizard Plate - Back Left (Max).stl",
+        "Wizard Frame/Wizard Parts Frame (Max)/Wizard Plate - Back Right (Max).stl",
+        "Wizard Frame/Wizard Parts Frame (Max)/Wizard Plate - Front Left (Max).stl",
+        "Wizard Frame/Wizard Parts Frame (Max)/Wizard Plate - Front Right (Max).stl",
+        "Wizard Frame/Wizard Parts Frame (Max)/Wizard Sleeve - Lower (Max).stl",
+        "Wizard Frame/Wizard Parts Frame (Max)/Wizard Sleeve - Upper (Max).stl",
+        "Wizard Frame/Wizard Parts Frame (Max)/Wizard Wing - Left (Max).stl",
+        "Wizard Frame/Wizard Parts Frame (Max)/Wizard Wing - Right (Max).stl",
+        "Wizard Frame/Wizard Parts Frame (Mini)/Wizard Parts Frame (Mini).stl",
+        "Wizard Frame/Wizard Parts Frame (Mini)/Wizard Plate - Back (Mini).stl",
+        "Wizard Frame/Wizard Parts Frame (Mini)/Wizard Plate - Front Left (Mini).stl",
+        "Wizard Frame/Wizard Parts Frame (Mini)/Wizard Plate - Front Right (Mini).stl",
+        "Wizard Frame/Wizard Solid Frame (Max)/Wizard Solid Body (Max).stl",
+        "Wizard Frame/Wizard Solid Frame (Max)/Wizard Solid Faceplate (Max).stl",
+        "Wizard Frame/Wizard Solid Frame (Mini)/Wizard Solid Body (Mini).stl",
+        "Wizard Frame/Wizard Solid Frame (Mini)/Wizard Solid Faceplate (Mini).stl"
+    ]
 }

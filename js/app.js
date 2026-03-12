@@ -27,7 +27,8 @@ let currentParts = {
 };
 
 function loadPart(category, filename) {
-    const path = `models/${category === 'body' ? 'bodies' : 'necks'}/${filename}`;
+    // This dynamically builds the URL using the exact folder and file path
+    const path = `models/${category}/${filename}`;
     
     loader.load(path, function (geometry) {
         // Remove the old part if it exists
