@@ -1,5 +1,10 @@
-body {
+/* css/style.css */
+
+html, body {
     margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh; /* Forces the body to fill the exact height of the browser window */
     overflow: hidden;
     font-family: sans-serif;
     display: flex;
@@ -9,13 +14,16 @@ body {
 
 #sidebar {
     width: 320px;
+    min-width: 320px; /* Prevents the 3D canvas from squishing the sidebar on small screens */
+    height: 100vh;
     background-color: #2b2b2b;
     padding: 20px;
+    box-sizing: border-box; /* Ensures padding stays inside the 320px width */
     box-shadow: 2px 0 5px rgba(0,0,0,0.5);
     z-index: 10;
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* Allows scrolling if you get lots of categories */
+    overflow-y: auto;
 }
 
 #sidebar h2 {
@@ -43,6 +51,7 @@ select {
     color: white;
     border: 1px solid #555;
     border-radius: 4px;
+    box-sizing: border-box;
 }
 
 #exportBtn {
@@ -56,6 +65,8 @@ select {
     cursor: pointer;
     font-weight: bold;
     transition: background-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 #exportBtn:hover {
@@ -64,9 +75,12 @@ select {
 
 #canvas-container {
     flex-grow: 1;
+    height: 100vh; /* Tells the container to stretch all the way to the bottom */
     position: relative;
+    background-color: #1a1a1a; /* Matches the scene background */
 }
 
 canvas {
     display: block;
+    outline: none;
 }
