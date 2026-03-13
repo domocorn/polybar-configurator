@@ -10,11 +10,26 @@
     <div id="sidebar">
         <h2>Polybar Builder</h2>
         
-		<div class="control-group">
-            <label for="filamentColor">Filament Color:</label>
+        <div class="control-group" style="background: #333; padding: 10px; border-radius: 4px;">
+            <label>Select Base Build:</label>
+            <label style="font-weight: normal;"><input type="radio" name="buildType" value="Micro" checked> Polybar Micro</label><br>
+            <label style="font-weight: normal;"><input type="radio" name="buildType" value="Mini"> Polybar Mini</label><br>
+            <label style="font-weight: normal;"><input type="radio" name="buildType" value="Max"> Polybar Max</label>
+        </div>
+
+        <div class="control-group" style="background: #333; padding: 10px; border-radius: 4px;">
+            <label>Optional Add-ons:</label>
+            <label style="font-weight: normal;"><input type="checkbox" id="toggleFrame"> Add Controller Frame</label><br>
+            <label style="font-weight: normal;"><input type="checkbox" id="toggleHeadstock"> Add Headstock</label>
+        </div>
+
+		<div class="control-group" style="background: #333; padding: 10px; border-radius: 4px; margin-top: 15px;">
+            <label for="filamentColor" style="margin-bottom: 8px;">Filament Color:</label>
             <input type="color" id="filamentColor" value="#909090" style="width: 100%; height: 40px; cursor: pointer; background: #444; border: 1px solid #555; border-radius: 4px;">
         </div>
-		
+
+        <hr style="border-color: #444; margin-bottom: 20px;">
+
         <div id="dynamic-menus"></div>
 
         <button id="exportBtn">Download Print Files (.zip)</button>
