@@ -1,5 +1,38 @@
 {
+    "Assembly Parts": [
+        "Accessory Chassis.stl",
+        "Action Button Chassis.stl",
+        "Color Plate (Blank).stl",
+        "Color Plate (Power Switch).stl",
+        "Strum Bar Chassis (Long).stl",
+        "Strum Bar Chassis (Short).stl"
+    ],
     "Frames": [
+        "Pioneer Frame/Accessory Parts/Strap Lug.stl",
+        "Pioneer Frame/Accessory Parts/Whammy Chassis.stl",
+        "Pioneer Frame/Accessory Parts/Whammy Magnet Paddle.stl",
+        "Pioneer Frame/Accessory Parts/Whammy Spring.stl",
+        "Pioneer Frame/Pioneer Headstock/Fret Cap - Headstock.stl",
+        "Pioneer Frame/Pioneer Headstock/Headstock Dowel.stl",
+        "Pioneer Frame/Pioneer Headstock/Headstock Tuner.stl",
+        "Pioneer Frame/Pioneer Headstock/Pioneer Headstock Base.stl",
+        "Pioneer Frame/Pioneer Headstock/Pioneer Headstock Faceplate.stl",
+        "Pioneer Frame/Pioneer Parts Frame (Max)/Pioneer Plate - Back Left (Max).stl",
+        "Pioneer Frame/Pioneer Parts Frame (Max)/Pioneer Plate - Back Right (Max).stl",
+        "Pioneer Frame/Pioneer Parts Frame (Max)/Pioneer Plate - Front Left (Max).stl",
+        "Pioneer Frame/Pioneer Parts Frame (Max)/Pioneer Plate - Front Right (Max).stl",
+        "Pioneer Frame/Pioneer Parts Frame (Max)/Pioneer Sleeve - Lower (Max).stl",
+        "Pioneer Frame/Pioneer Parts Frame (Max)/Pioneer Sleeve - Upper (Max).stl",
+        "Pioneer Frame/Pioneer Parts Frame (Max)/Pioneer Wing - Left (Max).stl",
+        "Pioneer Frame/Pioneer Parts Frame (Max)/Pioneer Wing - Right (Max).stl",
+        "Pioneer Frame/Pioneer Parts Frame (Mini)/Pioneer Parts Frame (Mini).stl",
+        "Pioneer Frame/Pioneer Parts Frame (Mini)/Pioneer Plate - Back (Mini).stl",
+        "Pioneer Frame/Pioneer Parts Frame (Mini)/Pioneer Plate - Front Left (Mini).stl",
+        "Pioneer Frame/Pioneer Parts Frame (Mini)/Pioneer Plate - Front Right (Mini).stl",
+        "Pioneer Frame/Pioneer Solid Frame (Max)/Pioneer Solid Body (Max).stl",
+        "Pioneer Frame/Pioneer Solid Frame (Max)/Pioneer Solid Faceplate (Max).stl",
+        "Pioneer Frame/Pioneer Solid Frame (Mini)/Pioneer Solid Body (Mini).stl",
+        "Pioneer Frame/Pioneer Solid Frame (Mini)/Pioneer Solid Faceplate (Mini).stl",
         "Wizard Frame/Accessory Parts/Strap Lug.stl",
         "Wizard Frame/Accessory Parts/Whammy Chassis.stl",
         "Wizard Frame/Accessory Parts/Whammy Magnet Paddle.stl",
@@ -25,5 +58,47 @@
         "Wizard Frame/Wizard Solid Frame (Max)/Wizard Solid Faceplate (Max).stl",
         "Wizard Frame/Wizard Solid Frame (Mini)/Wizard Solid Body (Mini).stl",
         "Wizard Frame/Wizard Solid Frame (Mini)/Wizard Solid Faceplate (Mini).stl"
+    ],
+    "Handwire Parts": [
+        "Accessory Button Insert.stl",
+        "Accessory Button.stl",
+        "Fret Mount Bracket Base.stl",
+        "Fret Mount Bracket.stl",
+        "Micro Bracket Board.stl",
+        "MiniMax Bracket Board.stl",
+        "Pico Bracket.stl",
+        "Strum Switch Insert.stl"
+    ],
+    "Housing Parts": [
+        "Fret Housing - Bottom.stl",
+        "Fret Housing - Top.stl",
+        "Housing Cap - Fret.stl",
+        "Housing Cap - Strum (USK PCB).stl",
+        "Housing Cap - Strum.stl",
+        "Long Extension Housing - Bottom.stl",
+        "Long Extension Housing - Top.stl",
+        "Micro Housing - Bottom.stl",
+        "Micro Housing - Top.stl",
+        "Short Extension Housing - Bottom.stl",
+        "Short Extension Housing - Top.stl",
+        "Strum Housing - Bottom.stl",
+        "Strum Housing - Top.stl"
+    ],
+    "Input Parts": [
+        "Action Button.stl",
+        "Fret Color Chip.stl",
+        "Fret Insert (Kailh Choc).stl",
+        "Fret Insert (MX Cherry).stl",
+        "Fret Stop Plate (Kailh Choc).stl",
+        "Fret Window.stl",
+        "Joystick.stl",
+        "Pivot Pin.stl",
+        "Strum Bar (Long).stl",
+        "Strum Bar (Short).stl"
+    ],
+    "Supplementary Parts": [
+        "Kailh Choc PCB Riser (DIY PCB).stl",
+        "Micro Fret PCB Support (USK PCB).stl",
+        "MX Cherry Riser (DIY PCB).stl"
     ]
 }
