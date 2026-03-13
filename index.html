@@ -2,8 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Polybar Configurator</title>
+    <title>Polybar Configurator - Modern Fork</title>
     <link rel="stylesheet" href="css/style.css">
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -23,7 +32,7 @@
             <label style="font-weight: normal;"><input type="checkbox" id="toggleHeadstock"> Add Headstock</label>
         </div>
 
-		<div class="control-group" style="background: #333; padding: 10px; border-radius: 4px; margin-top: 15px;">
+        <div class="control-group" style="background: #333; padding: 10px; border-radius: 4px; margin-top: 15px;">
             <label for="filamentColor" style="margin-bottom: 8px;">Filament Color:</label>
             <input type="color" id="filamentColor" value="#909090" style="width: 100%; height: 40px; cursor: pointer; background: #444; border: 1px solid #555; border-radius: 4px;">
         </div>
@@ -37,13 +46,10 @@
 
     <div id="canvas-container"></div>
 
-    <script src="js/three.min.js"></script>
-    <script src="js/STLLoader.js"></script>
-    <script src="js/OrbitControls.js"></script>
     <script src="js/jszip.min.js"></script>
     <script src="js/FileSaver.min.js"></script>
     
-    <script src="js/app.js"></script>
+    <script type="module" src="js/app.js"></script>
 
 </body>
 </html>
