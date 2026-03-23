@@ -3,18 +3,18 @@
 // ==========================================
 import * as THREE from 'three';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; // NEW IMPORT
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const container = document.getElementById('canvas-container');
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 5000);
+const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 5000); // Updated Far Plane
 camera.position.set(0, 150, 300);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
 container.appendChild(renderer.domElement);
 
-// Notice: We drop the "THREE." prefix here because of the module import
 const controls = new OrbitControls(camera, renderer.domElement);
 
 scene.add(new THREE.AmbientLight(0xffffff, 0.5));
@@ -27,86 +27,118 @@ scene.add(dirLight);
 // ==========================================
 const buildRecipes = {
     'Micro': ['Core_Micro', 'Shared_Inputs'],
-    'Mini':  ['Core_Mini', 'Shared_Inputs', 'Shared_Necks'],
-    'Max':   ['Core_Mini', 'Core_Max', 'Shared_Inputs', 'Shared_Necks']
+    'Mini': ['Core_Mini', 'Shared_Inputs', 'Shared_Necks'],
+    'Max': ['Core_Mini', 'Core_Max', 'Shared_Inputs', 'Shared_Necks']
 };
 
 const assemblyOffsets = {
-    'Core_Max': { x: 0, y: 0, z: -100 },
-    'Shared_Necks': { x: 0, y: 0, z: 150 },
-    'Addon_Headstock': { x: 0, y: 0, z: 300 }
+    'Core_Max': { x: 0, y: 0, z: 0 },
+    'Shared_Necks': { x: 0, y: 0, z: 0 },
+    'Addon_Headstock': { x: 0, y: 0, z: 0 }
 };
 
 const explodeOffsets = {
-    'Core_Max': { x: 0, y: 0, z: -100 },
-    'Shared_Necks': { x: 0, y: 0, z: 100 },
-    'Addon_Frame': { x: 0, y: -150, z: 0 }, 
-    'Addon_Headstock': { x: 0, y: 0, z: 150 }
+    // 1. FOLDER Defaults (fallback if specific file isn't listed)
+    //'Core_Max': { x: 0, y: 0, z: -100 },
+    //'Shared_Necks': { x: 0, y: 0, z: 100 },
+    //'Addon_Frame': { x: 0, y: -150, z: 0 },
+    //'Addon_Headstock': { x: 0, y: 0, z: 150 },
+
+    // 2. FILE-SPECIFIC Overrides (matches exactly against the filename without .stl)
+    // You can add exact STL names here to move individual pieces differently!
+    // Example: 'PolybarMicroBuildPrint_(Unsaved)_Housing Parts_1_Housing Cap - Fret_1_Body1': { x: 0, y: 200, z: 50 },
+    'PolybarMicroBuildPrint_StrumBar': { x: 0, y: 0, z: 100 },
+    'PolybarMicroBuildPrint_Strum Bar Chassis': { x: 0, y: 0, z: 75 },
+    'PolybarMicroBuildPrint_Micro Housing Top': { x: 0, y: 0, z: 50 },
+    'PolybarMicroBuildPrint - Housing Cap - Fret': { x: -50, y: 0, z: 0 },
+    'PolybarMicroBuildPrint - Housing Cap - Strum': { x: 50, y: 0, z: 0 },
 };
 
 const partRules = {
-    'fret.stl': [
-        { x: 0, y: 0, z: 0 },   
-        { x: 0, y: 0, z: 25 },  
-        { x: 0, y: 0, z: 50 },  
-        { x: 0, y: 0, z: 75 },  
-        { x: 0, y: 0, z: 100 }  
-    ]
+    // If you plan to export each fret as an individual file (e.g., Fret_1.stl, Fret_2.stl),
+    // you don't need these rules. If you still import 1 fret and want to clone it, 
+    // you will need to re-add the Z offsets here. For now, we spawn exactly as exported.
 };
 
 // ==========================================
 // 3. ENGINE STATE & LOADING
 // ==========================================
-// Notice: We drop the "THREE." prefix here too
-const loader = new STLLoader();
+const stlLoader = new STLLoader();
+const gltfLoader = new GLTFLoader(); // NEW LOADER INIT
 const defaultMaterial = new THREE.MeshStandardMaterial({ color: 0x909090, roughness: 0.4, metalness: 0.1 });
 
-let globalCatalog = {};   
-let activeMeshes = [];    
+let globalCatalog = {};
+let activeMeshes = [];
 
 function clearScene() {
     activeMeshes.forEach(mesh => scene.remove(mesh));
     activeMeshes = [];
 }
 
+// Helper function to handle positioning for both STL and GLTF
+function setupAndAddMesh(object3D, pos, catOffset, isExploded, expOff, category, filename) {
+    const finalX = catOffset.x + pos.x;
+    const finalY = catOffset.y + pos.y;
+    const finalZ = catOffset.z + pos.z;
+
+    object3D.userData.basePosition = { x: finalX, y: finalY, z: finalZ };
+    object3D.userData.category = category;
+    object3D.userData.filename = filename;
+
+    // Start parts at their built location
+    object3D.position.set(finalX, finalY, finalZ);
+
+    // Set target position for lerp animation
+    if (isExploded) {
+        object3D.userData.targetPosition = { x: finalX + expOff.x, y: finalY + expOff.y, z: finalZ + expOff.z };
+    } else {
+        object3D.userData.targetPosition = { x: finalX, y: finalY, z: finalZ };
+    }
+
+    scene.add(object3D);
+    activeMeshes.push(object3D);
+}
+
 function loadPart(category, filepath) {
-    const path = `models/${category}/${filepath}`;
-    const filename = filepath.split('/').pop(); 
-    
-    loader.load(path, function (geometry) {
-        
-        // COMMENTED OUT: This preserves your STL positional data from CAD!
-        geometry.center(); 
-        
-        const positions = partRules[filename] || [{ x: 0, y: 0, z: 0 }];
-        const catOffset = assemblyOffsets[category] || { x: 0, y: 0, z: 0 };
-        const isExploded = document.getElementById('explodeToggle')?.checked;
-        const expOff = explodeOffsets[category] || { x: 0, y: 150, z: 0 };
+    const path = `models/visual/${category}/${filepath}`;
+    const filename = filepath.split('/').pop();
+    const extension = filename.split('.').pop().toLowerCase(); // Grab the extension
 
-        positions.forEach(pos => {
-            const mesh = new THREE.Mesh(geometry, defaultMaterial);
-            mesh.rotation.x = -Math.PI / 2;
-            
-            const finalX = catOffset.x + pos.x;
-            const finalY = catOffset.y + pos.y;
-            const finalZ = catOffset.z + pos.z;
+    const positions = partRules[filename] || [{ x: 0, y: 0, z: 0 }];
+    const catOffset = assemblyOffsets[category] || { x: 0, y: 0, z: 0 };
+    const isExploded = document.getElementById('explodeToggle')?.checked;
 
-            mesh.userData.basePosition = { x: finalX, y: finalY, z: finalZ };
-            mesh.userData.category = category;
+    const baseFilename = filename.split('.')[0];
+    const expOff = explodeOffsets[baseFilename] || explodeOffsets[category] || { x: 0, y: 0, z: 0 };
 
-            if (isExploded) {
-                mesh.position.set(finalX + expOff.x, finalY + expOff.y, finalZ + expOff.z);
-            } else {
-                mesh.position.set(finalX, finalY, finalZ);
-            }
+    if (extension === 'stl') {
+        stlLoader.load(path, function (geometry) {
+            positions.forEach(pos => {
+                const mesh = new THREE.Mesh(geometry, defaultMaterial);
+                // mesh.rotation.x = -Math.PI / 2; // COMMENTED OUT: If using native Fusion coords, you may not need to flip 90 degrees anymore depending on your up-axis.
 
-            scene.add(mesh);
-            activeMeshes.push(mesh); 
-        });
-        
-    }, undefined, function (error) {
-        console.error(`Error loading ${filepath}:`, error);
-    });
+                setupAndAddMesh(mesh, pos, catOffset, isExploded, expOff, category, baseFilename);
+            });
+        }, undefined, function (error) { console.error(`Error loading ${filepath}:`, error); });
+
+    } else if (extension === 'glb' || extension === 'gltf') {
+        gltfLoader.load(path, function (gltf) {
+            positions.forEach(pos => {
+                const model = gltf.scene.clone();
+
+                // GLTFs come with their own materials baked in. 
+                // This forces them to use your UI's Filament Color picker instead.
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.material = defaultMaterial;
+                    }
+                });
+
+                // GLTFs usually handle up-axis better than STLs, so we skip the Math.PI/2 rotation here.
+                setupAndAddMesh(model, pos, catOffset, isExploded, expOff, category, baseFilename);
+            });
+        }, undefined, function (error) { console.error(`Error loading ${filepath}:`, error); });
+    }
 }
 
 // ==========================================
@@ -121,8 +153,8 @@ function updateSceneAndUI() {
 
     const activeCoreFolders = buildRecipes[buildType] || [];
     activeCoreFolders.forEach(category => {
-        if (globalCatalog[category]) {
-            globalCatalog[category].forEach(filepath => {
+        if (globalCatalog.visual && globalCatalog.visual[category]) {
+            globalCatalog.visual[category].forEach(filepath => {
                 loadPart(category, filepath);
             });
         }
@@ -157,37 +189,37 @@ async function loadCatalog() {
         const response = await fetch('catalog.json?' + new Date().getTime());
         globalCatalog = await response.json();
         const menuContainer = document.getElementById('dynamic-menus');
-        
-        for (const category in globalCatalog) {
-            if (!category.startsWith('Addon_')) continue; 
 
-            const files = globalCatalog[category];
-            if (files.length === 0) continue; 
-            
+        for (const category in globalCatalog.visual) {
+            if (!category.startsWith('Addon_')) continue;
+
+            const files = globalCatalog.visual[category];
+            if (files.length === 0) continue;
+
             const groupDiv = document.createElement('div');
-            groupDiv.className = 'control-group dynamic-group'; 
-            groupDiv.dataset.category = category; 
-            
+            groupDiv.className = 'control-group dynamic-group';
+            groupDiv.dataset.category = category;
+
             const label = document.createElement('label');
             label.textContent = `Select ${category.replace(/_/g, ' ')}:`;
             groupDiv.appendChild(label);
-            
+
             const select = document.createElement('select');
-            select.dataset.category = category; 
-            
+            select.dataset.category = category;
+
             files.forEach(filepath => {
                 const option = document.createElement('option');
-                option.value = filepath; 
+                option.value = filepath;
                 option.textContent = filepath.split('/').pop().replace('.stl', '');
                 select.appendChild(option);
             });
-            
+
             select.addEventListener('change', updateSceneAndUI);
-            
+
             groupDiv.appendChild(select);
             menuContainer.appendChild(groupDiv);
         }
-        
+
         updateSceneAndUI();
 
     } catch (error) {
@@ -214,8 +246,8 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
         const activeCoreFolders = buildRecipes[buildType] || [];
 
         activeCoreFolders.forEach(category => {
-            if (globalCatalog[category]) {
-                globalCatalog[category].forEach(filepath => {
+            if (globalCatalog.print && globalCatalog.print[category]) {
+                globalCatalog.print[category].forEach(filepath => {
                     filesToFetch.push({ category, filepath });
                 });
             }
@@ -225,20 +257,31 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
         visibleGroups.forEach(group => {
             if (group.style.display !== 'none') {
                 const select = group.querySelector('select');
-                filesToFetch.push({ category: select.dataset.category, filepath: select.value });
+                const selectedVisualBase = select.value.split('/').pop().split('.')[0];
+
+                if (globalCatalog.print && globalCatalog.print[select.dataset.category]) {
+                    globalCatalog.print[select.dataset.category].forEach(filepath => {
+                        const printBase = filepath.split('/').pop().split('.')[0];
+                        // Export if the base filename matches, OR if there's only 1 master print file in this addon category
+                        if (printBase === selectedVisualBase || globalCatalog.print[select.dataset.category].length === 1) {
+                            filesToFetch.push({ category: select.dataset.category, filepath });
+                        }
+                    });
+                }
             }
         });
 
         for (let i = 0; i < filesToFetch.length; i++) {
             const item = filesToFetch[i];
-            const filenameOnly = item.filepath.split('/').pop(); 
-            
+            const filenameOnly = item.filepath.split('/').pop();
+
             if (partRules[filenameOnly] && partRules[filenameOnly].length > 1) {
                 instructionsText += `- ${filenameOnly}: Print ${partRules[filenameOnly].length} copies\n`;
                 needsInstructions = true;
             }
 
-            const blob = await fetch(`models/${item.category}/${item.filepath}`).then(res => res.blob());
+            const timestamp = new Date().getTime();
+            const blob = await fetch(`models/print/${item.category}/${item.filepath}?v=${timestamp}`).then(res => res.blob());
             zip.file(`${item.category}_${filenameOnly}`, blob);
         }
 
@@ -273,12 +316,19 @@ document.getElementById('explodeToggle')?.addEventListener('change', (e) => {
     activeMeshes.forEach(mesh => {
         const basePos = mesh.userData.basePosition;
         const cat = mesh.userData.category;
-        
+        const filename = mesh.userData.filename;
+
+        // 1. Try file-specific offset, 2. Try folder category offset, 3. Default fallback (Zero)
+        const expOff = explodeOffsets[filename] || explodeOffsets[cat] || { x: 0, y: 0, z: 0 };
+
         if (isExploded) {
-            const expOff = explodeOffsets[cat] || { x: 0, y: 150, z: 0 };
-            mesh.position.set(basePos.x + expOff.x, basePos.y + expOff.y, basePos.z + expOff.z);
+            mesh.userData.targetPosition = {
+                x: basePos.x + expOff.x,
+                y: basePos.y + expOff.y,
+                z: basePos.z + expOff.z
+            };
         } else {
-            mesh.position.set(basePos.x, basePos.y, basePos.z);
+            mesh.userData.targetPosition = { x: basePos.x, y: basePos.y, z: basePos.z };
         }
     });
 });
@@ -289,6 +339,16 @@ document.getElementById('explodeToggle')?.addEventListener('change', (e) => {
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
+
+    // Smooth animation (lerp) for positions
+    activeMeshes.forEach(mesh => {
+        if (mesh.userData.targetPosition) {
+            mesh.position.x += (mesh.userData.targetPosition.x - mesh.position.x) * 0.1;
+            mesh.position.y += (mesh.userData.targetPosition.y - mesh.position.y) * 0.1;
+            mesh.position.z += (mesh.userData.targetPosition.z - mesh.position.z) * 0.1;
+        }
+    });
+
     renderer.render(scene, camera);
 }
 animate();
