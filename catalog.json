@@ -1,32 +1,9 @@
 {
     "visual": {
-        "BackupCore_Micro": [
-            "PolybarMicroBuildPrint - Housing Cap - Fret.stl",
-            "PolybarMicroBuildPrint - Housing Cap - Strum.stl",
-            "PolybarMicroBuildPrint_(Unsaved)_Housing Parts_1_Micro Housing - Bottom_1_Body1.stl",
-            "PolybarMicroBuildPrint_Micro Housing Top.stl",
-            "PolybarMicroBuildPrint_Strum Bar Chassis.stl",
-            "PolybarMicroBuildPrint_StrumBar.stl"
-        ],
         "Core_Micro": [
-            "Polybar Micro - Action Button Chassis.stl",
-            "Polybar Micro - Action Button.stl",
-            "Polybar Micro - Fret Color Chip.stl",
-            "Polybar Micro - Fret Insert (Kailh Choc).stl",
-            "Polybar Micro - Fret Stop Plate (Kailh Choc).stl",
-            "Polybar Micro - Fret Window.stl",
-            "Polybar Micro - Housing Cap - Fret.stl",
-            "Polybar Micro - Housing Cap - Strum.stl",
-            "Polybar Micro - Micro Housing - Bottom.stl",
-            "Polybar Micro - Micro Housing - Top.stl",
-            "Polybar Micro - Strum Bar (Short).stl",
-            "Polybar Micro - Strum Bar Chassis (Short).stl",
             "PolybarMicroBuildPrint - Housing Cap - Fret.stl",
             "PolybarMicroBuildPrint - Housing Cap - Strum.stl",
-            "PolybarMicroBuildPrint_(Unsaved)_Handwire Parts_1_Fret Mount Bracket Base_1_Body1.stl",
-            "PolybarMicroBuildPrint_(Unsaved)_Handwire Parts_1_Micro Bracket Board_1_Body1.stl",
             "PolybarMicroBuildPrint_(Unsaved)_Housing Parts_1_Micro Housing - Bottom_1_Body1.stl",
-            "PolybarMicroBuildPrint_(Unsaved)_Supplementary Parts_1_Micro Fret PCB Support (USK PCB)_1_Body1.stl",
             "PolybarMicroBuildPrint_Micro Housing Top.stl",
             "PolybarMicroBuildPrint_Strum Bar Chassis.stl",
             "PolybarMicroBuildPrint_StrumBar.stl"
