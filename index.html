@@ -27,6 +27,19 @@
         </div>
 
         <div class="control-group" style="background: #333; padding: 10px; border-radius: 4px;">
+            <label>Internal Variant:</label>
+            <label style="font-weight: normal;"><input type="radio" name="variantType" value="USK" checked> USK PCB</label><br>
+            <label style="font-weight: normal;"><input type="radio" name="variantType" value="Handwire"> Handwire</label><br>
+            <label style="font-weight: normal;"><input type="radio" name="variantType" value="DIYPCB"> DIY PCB</label>
+        </div>
+
+        <div class="control-group" id="extensions-group" style="background: #333; padding: 10px; border-radius: 4px;">
+            <label>Body Length Extensions:</label>
+            <label style="font-weight: normal;"><input type="checkbox" id="toggleExtShort"> Add Short Extension</label><br>
+            <label style="font-weight: normal;"><input type="checkbox" id="toggleExtLong"> Add Long Extension</label>
+        </div>
+
+        <div class="control-group" style="background: #333; padding: 10px; border-radius: 4px;">
             <label>Optional Add-ons:</label>
             <label style="font-weight: normal;"><input type="checkbox" id="toggleFrame"> Add Controller Frame</label><br>
             <label style="font-weight: normal;"><input type="checkbox" id="toggleHeadstock"> Add Headstock</label>

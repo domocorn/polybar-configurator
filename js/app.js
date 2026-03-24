@@ -11,24 +11,51 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 5000); // Updated Far Plane
 camera.position.set(0, 150, 300);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
 container.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-dirLight.position.set(100, 100, 50);
-scene.add(dirLight);
+// --- PREMIUM STUDIO LIGHTING ---
+// Soft global illumination (Sky color, Ground color, Intensity)
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.4);
+hemiLight.position.set(0, 200, 0);
+scene.add(hemiLight);
+
+// Key Light (Main bright sunlight)
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+keyLight.position.set(100, 150, 100);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.width = 2048;
+keyLight.shadow.mapSize.height = 2048;
+keyLight.shadow.camera.near = 0.5;
+keyLight.shadow.camera.far = 1000;
+keyLight.shadow.camera.left = -300;
+keyLight.shadow.camera.right = 300;
+keyLight.shadow.camera.top = 300;
+keyLight.shadow.camera.bottom = -300;
+keyLight.shadow.bias = -0.0005;
+scene.add(keyLight);
+
+// Rim Light (Cool blue backlight to make geometry pop)
+const rimLight = new THREE.SpotLight(0x77b5fe, 2.5);
+rimLight.position.set(-150, 100, -200);
+rimLight.angle = Math.PI / 4;
+rimLight.penumbra = 0.5;
+scene.add(rimLight);
 
 // ==========================================
 // 2. RECIPES, RULES & OFFSETS
 // ==========================================
 const buildRecipes = {
     'Micro': ['Core_Micro', 'Shared_Inputs'],
-    'Mini': ['Core_Mini', 'Shared_Inputs', 'Shared_Necks'],
-    'Max': ['Core_Mini', 'Core_Max', 'Shared_Inputs', 'Shared_Necks']
+    'Mini': ['Core_Mini+Max', 'Shared_Inputs', 'Shared_Necks'],
+    'Max': ['Core_Mini+Max', 'Shared_Inputs', 'Shared_Necks']
 };
 
 const assemblyOffsets = {
@@ -37,22 +64,28 @@ const assemblyOffsets = {
     'Addon_Headstock': { x: 0, y: 0, z: 0 }
 };
 
-const explodeOffsets = {
-    // 1. FOLDER Defaults (fallback if specific file isn't listed)
-    //'Core_Max': { x: 0, y: 0, z: -100 },
-    //'Shared_Necks': { x: 0, y: 0, z: 100 },
-    //'Addon_Frame': { x: 0, y: -150, z: 0 },
-    //'Addon_Headstock': { x: 0, y: 0, z: 150 },
+const explodeRules = [
+    // --- EXACT PART KEYWORDS ---
+    // Make sure more specific names come first! e.g., 'Strumbar Chassis' before 'Strumbar'
+    { keywords: ['Housing Top', 'Housing - Top'], offset: { x: 0, y: 0, z: 50 } },
+    { keywords: ['Strum Bar Chassis', 'Strum Chassis', 'Action Button Chassis', 'Joystick', 'Stop Plate', 'Pivot Pin'], offset: { x: 0, y: 0, z: 75 } },
+    { keywords: ['StrumBar', 'Strum Bar', 'Action Button', 'Accessory Chassis'], offset: { x: 0, y: 0, z: 100 } },
+    { keywords: ['Fret Insert'], offset: { x: 0, y: 0, z: 100 } },
+    { keywords: ['Fret Window'], offset: { x: 0, y: 0, z: 115 } },
+    { keywords: ['Color Chip'], offset: { x: 0, y: 0, z: 130 } },
+    { keywords: ['Cap - Fret', 'Cap Fret'], offset: { x: -50, y: 0, z: 0 } },
+    { keywords: ['Cap - Strum', 'Cap Strum'], offset: { x: 50, y: 0, z: 0 } },
 
-    // 2. FILE-SPECIFIC Overrides (matches exactly against the filename without .stl)
-    // You can add exact STL names here to move individual pieces differently!
-    // Example: 'PolybarMicroBuildPrint_(Unsaved)_Housing Parts_1_Housing Cap - Fret_1_Body1': { x: 0, y: 200, z: 50 },
-    'PolybarMicroBuildPrint_StrumBar': { x: 0, y: 0, z: 100 },
-    'PolybarMicroBuildPrint_Strum Bar Chassis': { x: 0, y: 0, z: 75 },
-    'PolybarMicroBuildPrint_Micro Housing Top': { x: 0, y: 0, z: 50 },
-    'PolybarMicroBuildPrint - Housing Cap - Fret': { x: -50, y: 0, z: 0 },
-    'PolybarMicroBuildPrint - Housing Cap - Strum': { x: 50, y: 0, z: 0 },
-};
+    // --- NAMING CONVENTION TAGS ---
+    // Drop these tags into any filename to forcefully override its explosion distance
+    { keywords: ['_ExpY100'], offset: { x: 0, y: 100, z: 0 } },
+    { keywords: ['_ExpY75'], offset: { x: 0, y: 75, z: 0 } },
+    { keywords: ['_ExpY50'], offset: { x: 0, y: 50, z: 0 } },
+    { keywords: ['_ExpX50'], offset: { x: 50, y: 0, z: 0 } },
+    { keywords: ['_ExpX-50'], offset: { x: -50, y: 0, z: 0 } },
+    { keywords: ['_ExpZ50'], offset: { x: 0, y: 0, z: 50 } },
+    { keywords: ['_ExpZ-50'], offset: { x: 0, y: 0, z: -50 } }
+];
 
 const partRules = {
     // If you plan to export each fret as an individual file (e.g., Fret_1.stl, Fret_2.stl),
@@ -61,11 +94,60 @@ const partRules = {
 };
 
 // ==========================================
+// 2.5 DYNAMIC SHIFT OFFSETS (For Extensions)
+// ==========================================
+// Define how pieces should translate to "close the gap" or "make room" when modular extensions are toggled.
+// Provide the names of categories or exact filenames that need to move, and the distance they slide.
+const dynamicShifts = [
+    {
+        id: 'ExtShort',
+        isActive: () => {
+            const buildType = document.querySelector('input[name="buildType"]:checked').value;
+            return buildType === 'Max' || (buildType === 'Mini' && document.getElementById('toggleExtShort')?.checked);
+        },
+        keywords: ['Fret', 'Neck', 'Headstock', '_Slide'], // Any file containing these words will slide
+        offset: { x: -85, y: 0, z: 0 } // CHANGE THIS NUMBER to the exact length of the Short Extension
+    },
+    {
+        id: 'ExtLong',
+        isActive: () => {
+            const buildType = document.querySelector('input[name="buildType"]:checked').value;
+            return buildType === 'Max' || (buildType === 'Mini' && document.getElementById('toggleExtLong')?.checked);
+        },
+        keywords: ['Fret', 'Neck', 'Headstock', '_Slide'], // Any file containing these words will slide
+        offset: { x: -157, y: 0, z: 0 } // CHANGE THIS NUMBER to the exact length of the Long Extension
+    },
+    {
+        id: 'Close_Short_Gap',
+        isActive: () => {
+            const buildType = document.querySelector('input[name="buildType"]:checked').value;
+            if (buildType === 'Max' || buildType === 'Micro') return false; // Max has both, Micro has none
+
+            const isShort = document.getElementById('toggleExtShort')?.checked;
+            const isLong = document.getElementById('toggleExtLong')?.checked;
+
+            return isLong && !isShort; // Only trigger if Long is checked AND Short is empty
+        },
+        keywords: ['Long Extension'],
+        // Pulls the Long Extension backwards to dock with the Base Chassis
+        offset: { x: 85, y: 0, z: 0 }
+    }
+];
+
+// ==========================================
 // 3. ENGINE STATE & LOADING
 // ==========================================
 const stlLoader = new STLLoader();
 const gltfLoader = new GLTFLoader(); // NEW LOADER INIT
-const defaultMaterial = new THREE.MeshStandardMaterial({ color: 0x909090, roughness: 0.4, metalness: 0.1 });
+
+// Upgraded to a highly realistic physical material
+const defaultMaterial = new THREE.MeshPhysicalMaterial({
+    color: 0x909090,
+    roughness: 0.5,
+    metalness: 0.1,
+    clearcoat: 0.3,
+    clearcoatRoughness: 0.2
+});
 
 let globalCatalog = {};
 let activeMeshes = [];
@@ -77,13 +159,36 @@ function clearScene() {
 
 // Helper function to handle positioning for both STL and GLTF
 function setupAndAddMesh(object3D, pos, catOffset, isExploded, expOff, category, filename) {
-    const finalX = catOffset.x + pos.x;
-    const finalY = catOffset.y + pos.y;
-    const finalZ = catOffset.z + pos.z;
+    let activeShiftX = 0, activeShiftY = 0, activeShiftZ = 0;
+
+    // Apply any dynamic shift rules based on active UI extensions
+    dynamicShifts.forEach(shiftRule => {
+        if (shiftRule.isActive()) {
+            const shouldShift = shiftRule.keywords.some(kw => filename.includes(kw) || category.includes(kw));
+            if (shouldShift) {
+                activeShiftX += shiftRule.offset.x;
+                activeShiftY += shiftRule.offset.y;
+                activeShiftZ += shiftRule.offset.z;
+            }
+        }
+    });
+
+    const finalX = catOffset.x + pos.x + activeShiftX;
+    const finalY = catOffset.y + pos.y + activeShiftY;
+    const finalZ = catOffset.z + pos.z + activeShiftZ;
 
     object3D.userData.basePosition = { x: finalX, y: finalY, z: finalZ };
+    object3D.userData.explodeTarget = {
+        x: finalX + expOff.x,
+        y: finalY + expOff.y,
+        z: finalZ + expOff.z
+    };
     object3D.userData.category = category;
     object3D.userData.filename = filename;
+
+    // Enable Shadows
+    object3D.castShadow = true;
+    object3D.receiveShadow = true;
 
     // Start parts at their built location
     object3D.position.set(finalX, finalY, finalZ);
@@ -109,7 +214,14 @@ function loadPart(category, filepath) {
     const isExploded = document.getElementById('explodeToggle')?.checked;
 
     const baseFilename = filename.split('.')[0];
-    const expOff = explodeOffsets[baseFilename] || explodeOffsets[category] || { x: 0, y: 0, z: 0 };
+
+    let expOff = { x: 0, y: 0, z: 0 };
+    for (const rule of explodeRules) {
+        if (rule.keywords.some(kw => filename.includes(kw) || category.includes(kw))) {
+            expOff = { x: rule.offset.x, y: rule.offset.y, z: rule.offset.z };
+            break;
+        }
+    }
 
     if (extension === 'stl') {
         stlLoader.load(path, function (geometry) {
@@ -148,14 +260,42 @@ function updateSceneAndUI() {
     clearScene();
 
     const buildType = document.querySelector('input[name="buildType"]:checked').value;
+    const variantType = document.querySelector('input[name="variantType"]:checked')?.value || 'USK';
     const showFrame = document.getElementById('toggleFrame').checked;
     const showHeadstock = document.getElementById('toggleHeadstock').checked;
 
-    const activeCoreFolders = buildRecipes[buildType] || [];
+    // Toggle extension UI visibility based on Micro/Mini/Max
+    const extGroup = document.getElementById('extensions-group');
+    if (extGroup) extGroup.style.display = (buildType === 'Mini') ? 'block' : 'none';
+
+    // Figure out if extensions are active (Max forces both to be true, Micro forces both to false)
+    const isShortExtActive = (buildType === 'Max') || (buildType === 'Mini' && document.getElementById('toggleExtShort')?.checked);
+    const isLongExtActive = (buildType === 'Max') || (buildType === 'Mini' && document.getElementById('toggleExtLong')?.checked);
+
+    const activeCoreFolders = [...(buildRecipes[buildType] || [])];
+
+    // Add unified Extensions folder if any extension is active
+    if (isShortExtActive || isLongExtActive) activeCoreFolders.push('Extensions');
+
+    // Define Excluded Variants so we don't load rival UI pieces
+    const allVariants = ['USK', 'Handwire', 'DIYPCB'];
+    const excludeVariants = allVariants.filter(v => v !== variantType);
+
     activeCoreFolders.forEach(category => {
         if (globalCatalog.visual && globalCatalog.visual[category]) {
             globalCatalog.visual[category].forEach(filepath => {
-                loadPart(category, filepath);
+
+                // If it's the consolidated Extensions folder, filter out the ones we didn't ask for
+                if (category === 'Extensions') {
+                    if (filepath.includes('Short Extension') && !isShortExtActive) return;
+                    if (filepath.includes('Long Extension') && !isLongExtActive) return;
+                }
+
+                // If the filepath contains a rival variant keyword, skip loading it!
+                const isExcluded = excludeVariants.some(v => filepath.includes(v));
+                if (!isExcluded) {
+                    loadPart(category, filepath);
+                }
             });
         }
     });
@@ -177,9 +317,32 @@ function updateSceneAndUI() {
     });
 }
 
-document.querySelectorAll('input[name="buildType"]').forEach(r => r.addEventListener('change', updateSceneAndUI));
+document.querySelectorAll('input[name="buildType"]').forEach(r => r.addEventListener('change', (e) => {
+    // If switching away from Mini, optionally uncheck the boxes so they are fresh if returned to
+    if (e.target.value !== 'Mini') {
+        const shortExt = document.getElementById('toggleExtShort');
+        const longExt = document.getElementById('toggleExtLong');
+        if (shortExt) shortExt.checked = false;
+        if (longExt) longExt.checked = false;
+    }
+    updateSceneAndUI();
+}));
+document.querySelectorAll('input[name="variantType"]')?.forEach(r => r.addEventListener('change', updateSceneAndUI));
+document.getElementById('toggleExtShort')?.addEventListener('change', updateSceneAndUI);
+document.getElementById('toggleExtLong')?.addEventListener('change', updateSceneAndUI);
 document.getElementById('toggleFrame')?.addEventListener('change', updateSceneAndUI);
 document.getElementById('toggleHeadstock')?.addEventListener('change', updateSceneAndUI);
+
+document.getElementById('explodeToggle')?.addEventListener('change', function () {
+    const isExploded = this.checked;
+    activeMeshes.forEach(mesh => {
+        if (isExploded && mesh.userData.explodeTarget) {
+            mesh.userData.targetPosition = mesh.userData.explodeTarget;
+        } else if (mesh.userData.basePosition) {
+            mesh.userData.targetPosition = mesh.userData.basePosition;
+        }
+    });
+});
 
 // ==========================================
 // 5. CATALOG INITIALIZATION
@@ -243,12 +406,33 @@ document.getElementById('exportBtn').addEventListener('click', async () => {
         let needsInstructions = false;
 
         const buildType = document.querySelector('input[name="buildType"]:checked').value;
-        const activeCoreFolders = buildRecipes[buildType] || [];
+        const variantType = document.querySelector('input[name="variantType"]:checked')?.value || 'USK';
+
+        const isShortExtActive = (buildType === 'Max') || (buildType === 'Mini' && document.getElementById('toggleExtShort')?.checked);
+        const isLongExtActive = (buildType === 'Max') || (buildType === 'Mini' && document.getElementById('toggleExtLong')?.checked);
+
+        const activeCoreFolders = [...(buildRecipes[buildType] || [])];
+
+        if (isShortExtActive || isLongExtActive) activeCoreFolders.push('Extensions');
+
+        const allVariants = ['USK', 'Handwire', 'DIYPCB'];
+        const excludeVariants = allVariants.filter(v => v !== variantType);
 
         activeCoreFolders.forEach(category => {
             if (globalCatalog.print && globalCatalog.print[category]) {
                 globalCatalog.print[category].forEach(filepath => {
-                    filesToFetch.push({ category, filepath });
+
+                    // Filter extensions by selection state if we are inside the extensions list
+                    if (category === 'Extensions') {
+                        if (filepath.includes('Short Extension') && !isShortExtActive) return;
+                        if (filepath.includes('Long Extension') && !isLongExtActive) return;
+                    }
+
+                    // Only fetch if it doesn't contain rival variant text
+                    const isExcluded = excludeVariants.some(v => filepath.includes(v));
+                    if (!isExcluded) {
+                        filesToFetch.push({ category, filepath });
+                    }
                 });
             }
         });

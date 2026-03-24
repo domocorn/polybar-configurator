@@ -1,6 +1,26 @@
 {
     "visual": {
+        "BackupCore_Micro": [
+            "PolybarMicroBuildPrint - Housing Cap - Fret.stl",
+            "PolybarMicroBuildPrint - Housing Cap - Strum.stl",
+            "PolybarMicroBuildPrint_(Unsaved)_Housing Parts_1_Micro Housing - Bottom_1_Body1.stl",
+            "PolybarMicroBuildPrint_Micro Housing Top.stl",
+            "PolybarMicroBuildPrint_Strum Bar Chassis.stl",
+            "PolybarMicroBuildPrint_StrumBar.stl"
+        ],
         "Core_Micro": [
+            "Polybar Micro - Action Button Chassis.stl",
+            "Polybar Micro - Action Button.stl",
+            "Polybar Micro - Fret Color Chip.stl",
+            "Polybar Micro - Fret Insert (Kailh Choc).stl",
+            "Polybar Micro - Fret Stop Plate (Kailh Choc).stl",
+            "Polybar Micro - Fret Window.stl",
+            "Polybar Micro - Housing Cap - Fret.stl",
+            "Polybar Micro - Housing Cap - Strum.stl",
+            "Polybar Micro - Micro Housing - Bottom.stl",
+            "Polybar Micro - Micro Housing - Top.stl",
+            "Polybar Micro - Strum Bar (Short).stl",
+            "Polybar Micro - Strum Bar Chassis (Short).stl",
             "PolybarMicroBuildPrint - Housing Cap - Fret.stl",
             "PolybarMicroBuildPrint - Housing Cap - Strum.stl",
             "PolybarMicroBuildPrint_(Unsaved)_Handwire Parts_1_Fret Mount Bracket Base_1_Body1.stl",
@@ -10,9 +30,69 @@
             "PolybarMicroBuildPrint_Micro Housing Top.stl",
             "PolybarMicroBuildPrint_Strum Bar Chassis.stl",
             "PolybarMicroBuildPrint_StrumBar.stl"
+        ],
+        "Core_Mini+Max": [
+            "PolybarMini+Max Action Button_2_Body1.stl",
+            "PolybarMini+Max Assembly Parts Accessory Chassis.stl",
+            "PolybarMini+Max Assembly Parts Action Button Chassis.stl",
+            "PolybarMini+Max Assembly Parts Color Plate (Blank).stl",
+            "PolybarMini+Max Assembly Parts Color Plate (Power Switch).stl",
+            "PolybarMini+Max Assembly Parts Color Plate (Power Switch)_1_Body2.stl",
+            "PolybarMini+Max Assembly Parts Color Plate (Power Switch)_1_Body3.stl",
+            "PolybarMini+Max Assembly Parts Strum Bar Chassis (Long).stl",
+            "PolybarMini+Max Fret Color Chip_6_Body1.stl",
+            "PolybarMini+Max Fret Color Chip_7_Body1.stl",
+            "PolybarMini+Max Fret Color Chip_8_Body1.stl",
+            "PolybarMini+Max Fret Color Chip_9_Body1.stl",
+            "PolybarMini+Max Fret Insert (Kailh Choc)_6_Body1.stl",
+            "PolybarMini+Max Fret Insert (Kailh Choc)_7_Body1.stl",
+            "PolybarMini+Max Fret Insert (Kailh Choc)_8_Body1.stl",
+            "PolybarMini+Max Fret Insert (Kailh Choc)_9_Body1.stl",
+            "PolybarMini+Max Fret Stop Plate (Kailh Choc)_6_Body1.stl",
+            "PolybarMini+Max Fret Stop Plate (Kailh Choc)_7_Body1.stl",
+            "PolybarMini+Max Fret Stop Plate (Kailh Choc)_8_Body1.stl",
+            "PolybarMini+Max Fret Stop Plate (Kailh Choc)_9_Body1.stl",
+            "PolybarMini+Max Fret Window_6_Body1.stl",
+            "PolybarMini+Max Fret Window_7_Body1.stl",
+            "PolybarMini+Max Fret Window_8_Body1.stl",
+            "PolybarMini+Max Fret Window_9_Body1.stl",
+            "PolybarMini+Max Handwire Parts MiniMax Bracket Board.stl",
+            "PolybarMini+Max Handwire Parts Pico Bracket.stl",
+            "PolybarMini+Max Handwire Parts Strum Switch Insert.stl",
+            "PolybarMini+Max Housing Parts Fret Housing - Bottom.stl",
+            "PolybarMini+Max Housing Parts Fret Housing - Top.stl",
+            "PolybarMini+Max Housing Parts Housing Cap - Fret.stl",
+            "PolybarMini+Max Housing Parts Housing Cap - Strum (USK PCB).stl",
+            "PolybarMini+Max Housing Parts Strum Housing - Bottom.stl",
+            "PolybarMini+Max Housing Parts Strum Housing - Top.stl",
+            "PolybarMini+Max Input Parts Action Button.stl",
+            "PolybarMini+Max Input Parts Fret Color Chip.stl",
+            "PolybarMini+Max Input Parts Fret Insert (Kailh Choc).stl",
+            "PolybarMini+Max Input Parts Fret Stop Plate (Kailh Choc).stl",
+            "PolybarMini+Max Input Parts Fret Window.stl",
+            "PolybarMini+Max Input Parts Joystick.stl",
+            "PolybarMini+Max Input Parts Pivot Pin.stl",
+            "PolybarMini+Max Input Parts Strum Bar (Long).stl",
+            "PolybarMini+Max Pivot Pin_2_Body1.stl"
+        ],
+        "Extensions": [
+            "PolybarMax_Housing Long Extension Housing - Bottom.stl",
+            "PolybarMax_Housing Long Extension Housing - Top.stl",
+            "PolybarMax_Housing Short Extension Housing - Bottom.stl",
+            "PolybarMax_Housing Short Extension Housing - Top.stl"
+        ],
+        "Handwire": [
+            "PolybarMicroBuildPrint_(Unsaved)_Handwire Parts_1_Fret Mount Bracket Base_1_Body1.stl",
+            "PolybarMicroBuildPrint_(Unsaved)_Handwire Parts_1_Micro Bracket Board_1_Body1.stl"
+        ],
+        "USK_PCB": [
+            "PolybarMicroBuildPrint_(Unsaved)_Supplementary Parts_1_Micro Fret PCB Support (USK PCB)_1_Body1.stl"
         ]
     },
     "print": {
+        "Core_Max": [
+            "PolybarMax.3mf"
+        ],
         "Core_Micro": [
             "PolybarMicroBuild_(Unsaved)_Input Parts_1_Strum Bar (Short)_1_Body1.3mf"
         ]

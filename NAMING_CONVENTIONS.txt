@@ -1,0 +1,117 @@
+=============================================================
+ POLYBAR 3D CONFIGURATOR - MODEL NAMING & EXPORT GUIDE
+=============================================================
+This guide explains how to properly name and organize your 3D 
+files so the Polybar Web App automatically understands where 
+they belong, when to hide them, and when to move them!
+
+-------------------------------------------------------------
+ 1. FOLDER ARCHITECTURE (Visual vs. Print)
+-------------------------------------------------------------
+You MUST place your files into two separate root folders:
+  • models/visual/  --> Low-poly Models used for the Website Viewer
+  • models/print/   --> High-res Models/3MFs used for the .ZIP Download
+
+Inside those folders, you must use identical Category Folder names:
+  • Core_Micro
+  • Core_Mini+Max
+  • Extensions
+  • Shared_Inputs
+  • Shared_Necks
+
+*PRO TIP*: If you have many individual .stl files for the Web Viewer 
+in `models/visual/Core_Micro/`, you only need ONE master `.3mf` file 
+in `models/print/Core_Micro/`. The exporter is smart enough to just 
+grab the 3MF!
+
+-------------------------------------------------------------
+ 2. INTERNAL VARIANTS (USK / Handwire / DIYPCB)
+-------------------------------------------------------------
+If a specific piece (like a bracket or housing) is EXCLUSIVE to a 
+certain PCB layout, you just need to include the name of the layout 
+anywhere in the filename. The web app will auto-hide it if the user 
+selects a different variant!
+
+Keywords:
+  • "USK"
+  • "Handwire"
+  • "DIYPCB"
+
+Example:
+  • [CORRECT]  "Housing_Bottom_USK.stl" (Only shows when USK is ticked)
+  • [CORRECT]  "StrumBar_Handwire_Bracket.stl" (Only shows for Handwire)
+  • [NEUTRAL]  "Neck_Generic.stl" (Shows up for EVERY build, since no keyword is found)
+
+-------------------------------------------------------------
+ 3. EXTENSION SLIDING (Gap Closing)
+-------------------------------------------------------------
+When a user selects "Polybar Max" or adds an Extension, the web app 
+will automatically SPLIT the guitar and slide the top half forward 
+along the X-Axis to make room for the new extension blocks.
+
+To tell the web app that a piece belongs to the "Top Half" that 
+needs to slide, its filename (or category folder) must contain one 
+of these keywords:
+
+Keywords that trigger a Slide:
+  • "Fret"
+  • "Neck"
+  • "Headstock"
+  • "_Slide"
+
+Example:
+  • [SLIDES]     "Fret_Housing.stl" (Because it contains "Fret")
+  • [SLIDES]     "Custom_Bracket_Slide.stl" (Because it contains "_Slide")
+  • [STAYS PUT]  "Core_Bottom_Housing.stl" (Contains no keywords)
+
+-------------------------------------------------------------
+ 4. EXPLODED VIEW DYNAMICS
+-------------------------------------------------------------
+The app automatically separates parts when the Explode View is checked. 
+It searches the filenames for standard component keywords and blows 
+them apart by a predefined amount. 
+
+Default keywords automatically recognized:
+  • "Housing Top"      => Moves FORWARD 100mm
+  • "Strumbar Chassis" => Moves FORWARD 75mm
+  • "Strumbar"         => Moves FORWARD 50mm
+  • "Cap - Fret"       => Moves LEFT 50mm
+  • "Cap - Strum"      => Moves RIGHT 50mm
+
+OVERRIDE TAGS:
+If you want to manually dictate how far a piece explodes without writing 
+code, just drop one of these tags anywhere in the filename!
+  • `_ExpY100`   (Explodes up 100mm)
+  • `_ExpY75`    (Explodes up 75mm)
+  • `_ExpY50`    (Explodes up 50mm)
+  • `_ExpX50`    (Explodes Right 50mm)
+  • `_ExpX-50`   (Explodes Left 50mm)
+  • `_ExpZ50`    (Explodes Forward 50mm)
+
+*Note: Any piece that does NOT have a keyword or tag remains perfectly 
+still during an explosion!*
+
+-------------------------------------------------------------
+ 5. HOW TO EXPORT FROM FUSION 360
+-------------------------------------------------------------
+VISUAL FILES (For the Web Viewer):
+1. Hide everything you don't want to export using the Eyeball icon.
+2. Right-click the TOP-LEVEL ASSEMBLY at the top of the browser tree.
+3. Select "Save As Mesh".
+4. Set Structure to "One File Per Body".
+   --> This bakes the exact (x, y, z) coordinates into the files so they assemble perfectly online!
+
+PRINT FILES (For the ZIP Download):
+1. Combine your bodies or export individual STLs relative to their own local component origin so they lay flat, OR just save a master `.3mf` scene that is already laid out for printing.
+2. Drop this straight into the `models/print/` category folder!
+
+-------------------------------------------------------------
+ *** CRITICAL FINAL STEP ***
+-------------------------------------------------------------
+ANYTIME you add, delete, or rename a file in the `models/` folder, 
+you MUST rebuild the catalog so the website knows it exists!
+
+To do this:
+1. Open your terminal in the project folder.
+2. Run: `python update_catalog.py`
+3. Hard Refresh your browser (Ctrl + Shift + R).
